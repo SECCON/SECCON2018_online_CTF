@@ -1,3 +1,26 @@
+Overview:
+
+Analyze the USN journal recorded in the Windows OS, follow the changed history of the file name,
+Connecting the changed file name becomes a flag.
+
+
+Contents:
+1 "J" file which unzipped the "J. zip" file of the problem is analyzed with usn_analytics etc.
+Usn_analytics: http://www.kazamiya.net/usn_analytics
+2 Among the formatted USN journals, Reason is set as CREATE (file creation) and NEWNAME (file name change)
+3 If the FileID is the same FileID, since it is the same file, we will look at FileName paying attention to FileID
+4 File ID 60666 shows that SEC.txt is created at 2018/9/29 16: 54: 38
+5 Continue, with the same FileID 60666, CON {.txt, F0r.txt, ensic.txt, s.txt, _usnjrnl.txt, 2018} .txt
+You can see that the file name has been changed
+6 Connecting the changed file names will result in SECCON {F0rensics_usnjrnl2018}
+
+Other:
+J. zip is only for reducing the file size.
+
+
+
+-----------
+
 ●概要
 　Windows OSで記録されるUSNジャーナルを解析し、ファイル名の変更された履歴を追い、
 変更されたファイル名をつなぐとフラグとなる。
