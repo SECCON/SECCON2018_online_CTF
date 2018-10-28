@@ -1,0 +1,27 @@
+-- makefile.sh
+echo 'SECCON{'`cat key`'}' > flag.txt
+zip -e --password=`perl -e "print time()"` flag.zip flag.txt
+--
+
+players have to unzip the zipped flag.zip with password.
+the password is `perl -e "print time()"`, current time when zipped it.
+but, flag.txt was created on same time.
+
+$ unzip -l files/flag.zip 
+Archive:  files/flag.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+       32  10-27-2018 00:10   flag.txt
+---------                     -------
+       32                     1 file
+
+the unix time of "10-27-2018 00:10" is password.
+
+$ python exploit.py 
+1540566641
+$ unzip flag.zip 
+Archive:  flag.zip
+[flag.zip] flag.txt password: 1540566641 (<-input)
+  inflating: flag.txt                
+$ cat flag.txt 
+SECCON{We1c0me_2_SECCONCTF2o18}

@@ -1,0 +1,7 @@
+Floating precision error to OOB read & write
+
+OOB read occurs in resize_img due to precision error, OOB write occurs in draw_a_line due to same reason, both in commands.cc.
+
+Exploiter may consider tcache to OOB read and leak libc pointer. Then one can trigger underflow on pixel_array to overwrite width, height with specified color, then resize with size larger than MMAP_THRESHOLD, and overwrite libc pointers.
+
+I used magic gadget to exploit this.

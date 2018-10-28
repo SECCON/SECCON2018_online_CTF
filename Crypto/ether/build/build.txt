@@ -1,0 +1,25 @@
+1. geth init
+2. move the master key to keystore dir
+3. run and check enode
+4. stop
+5. make static-nodes.json
+6. run
+
+# build
+$ cp docker-compose.yaml.1 docker-compose.yaml
+$ chmod 777 server/flask/src/db.json
+$ docker-compose build
+$ docker-compose up
+
+$ cp docker-compose.yaml.2 docker-compose.yaml
+$ chmod 777 server/flask/src/db.json
+$ docker-compose build
+
+# start
+$ docker-compose up
+
+# mining
+http://IP/kLPm23z6HjnXKD99/miner/start
+
+# show status
+http://IP/kLPm23z6HjnXKD99/admin/show

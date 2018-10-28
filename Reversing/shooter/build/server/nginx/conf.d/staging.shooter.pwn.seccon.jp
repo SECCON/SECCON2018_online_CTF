@@ -1,0 +1,31 @@
+upstream shooter_stg {
+  server unix:/var/www/app/shooter_stg/current/tmp/sockets/puma.sock;
+}
+
+server {
+  listen *:80;
+  server_name staging.shooter.pwn.seccon.jp;
+
+  access_log /var/log/nginx/staging.shooter.pwn.seccon.jp_access.log;
+  error_log /var/log/nginx/staging.shooter.pwn.seccon.jp_error.log;
+
+  location ~ ^/(assets|apple-icon|ms-icon|apple-touch|favicon|browserconfig|robots|manifest|android-icon) {
+    root /var/www/app/shooter_stg/current/public;
+  }
+
+  location ~ ^/(assets|uploads) {
+    root /var/www/app/shooter_stg/current/public;
+  }
+
+  location ~ ^/ {
+    proxy_redirect                        off;
+    proxy_set_header    Host              $host;
+    proxy_set_header    X-Real-IP         $remote_addr;
+    proxy_set_header    X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header    X-Forwarded-Proto $scheme;
+    proxy_set_header    X-Forwarded-Port  $server_port;
+    proxy_set_header    X-Forwarded-Host  $host;
+
+    proxy_pass http://shooter_stg;
+  }
+}

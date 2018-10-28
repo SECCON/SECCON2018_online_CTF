@@ -1,0 +1,7 @@
+Smart Gacha Lv.1
+
+Toggle the "getItem" boolean value in "fair lottery contract" to true.
+If you are lucky, you have only to press "test luck" button once.
+Even if you are not lucky, all you have to do is press the button 1,000,000 times.
+
+Server:http://ether.pwn.seccon.jp/

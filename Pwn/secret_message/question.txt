@@ -1,0 +1,4 @@
+secret_message
+
+Let's share a secret with us
+nc secret-message.pwn.seccon.jp 31337

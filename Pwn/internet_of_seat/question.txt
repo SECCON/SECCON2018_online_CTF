@@ -1,0 +1,4 @@
+Who doesn't love IoT? Based on real life. Flag is on /flag.txt .
+(QEMU running on Ubuntu 16.04 latest for setting environment)
+
+nc internet-of-seat.pwn.seccon.jp 1337

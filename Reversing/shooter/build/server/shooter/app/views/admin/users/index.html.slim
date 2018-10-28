@@ -1,0 +1,7 @@
+.row
+  h1 Last 20 scores
+.row
+  ul.list-group
+    - Score.order(id: :desc).limit(20).each do |score|
+      li.list-group-item
+        | #{score.id}: #{score.name} (#{score.score})

@@ -1,0 +1,20 @@
+This challenge need a web server. the below is how to setup.
+[Ubuntu]
+apt install libzbar0
+apt install libzbar-dev
+apt install zbar-tools
+apt install python3-pip
+pip3 install setuptools --upgrade
+pip3 install zbarlight
+pip3 install pillow
+
+1. Install HTTP server.
+2. input below command
+
+$ cp qr.cgi to /usr/lib/cgi-bin/
+$ cp flag to /usr/lib/cgi-bin/
+$ chmod 666 /usr/lib/cgi-bin/flag
+
+Please check the permission of flag file.
+Player can't access the flag file in cg-bin.
+

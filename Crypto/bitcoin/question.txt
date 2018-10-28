@@ -1,0 +1,6 @@
+Electrum Kamuy
+
+Collect secrets.
+FLAG: SECCON{md5(583...)}
+
+Server:http://bitcoin.pwn.seccon.jp/

@@ -1,0 +1,6 @@
+Connect to the blockchain network using ethereum client on your own.
+To get the password of the contract, type
+"eth.getStorageAt('contract address', 6)"
+in your console.
+You will get private password, and can be the owner of the contract.
+You can manipulate the result easily if you know seed and block number.

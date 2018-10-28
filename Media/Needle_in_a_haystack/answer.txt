@@ -1,0 +1,51 @@
+## Overview
+Read the opening and closing of the curtain at the right end of the screen, the window of Westin Osaka (the far rightmost row, the 12th from the top).
+Morse code signal with short point set to 1 minute is transmitted.
+
+## solution
+
+Since the opening and closing of the curtain corresponds to Morse code,
+When the curtain is open (when the light is on as indoor light can be seen at night, turning it on) is turned on
+Turn off when the curtain is closed (when the light is off as the room light is not visible at night)
+, Morse code is decoded.
+
+The signal is sent only once.
+
+Although there are several assumed solutions, basically you create time lapse movies and read the signals.
+
+Solution 1
+If it is time lapse of a realistic length, one room of the building flashes suspiciously suspiciously and soon notices it.
+
+It is good to make an image analysis program by turning ON = ON, decode it, and decode it with eyes.
+However, when doing with a program, it will not move at the time of switching to the day mode, so it is a mechanism to +1 the regret.
+
+Solution 2
+When the position of the signal is unknown or intuition is intolerable, pixels are arranged in one dimension and binarized, and when it is arranged side by side on the time axis, Morse 's streak appears in several places, so decode it.
+Likewise, since the streak disappears (or reverses) where it switches to the day mode, fine adjustment by hand is necessary.
+
+
+--------------
+## 概要
+画面右端のビル、ウェスティン大阪の窓(一番右端の列、上から12番目)のカーテンの開閉を読み取る。
+短点を1分としたモールス信号を送信している。
+
+## 解法
+
+カーテンの開閉がモールス信号に対応しているので、
+カーテンが開いているとき（夜は室内の明かりが見えるので点灯時）を ON
+カーテンが閉じているとき（夜は室内の明かりが見えないので消灯時）を OFF
+として、モールス信号をデコードする。
+
+信号は一度しか送られない。
+
+想定解はいくつかあるが、基本的にはタイムラプス動画を作成して信号を読み取る。
+
+解法 1
+現実的な長さのタイムラプスにすれば、あからさまに怪しくビルの一室が点滅するので、すぐに気づく。
+
+点灯 = ON として画像解析プログラムを作ってデコードするも良し、目でデコードするも良し。
+但し、プログラムでやる場合は昼モードに切り替わる時点で動かなくなるので、悔しさを +1 する仕掛け。
+
+解法 2
+信号の位置が分からない場合や勘が鈍い場合、画素を1次元に並べ2値化し、それを時間軸に並べて見ると何箇所かにモールスのスジが出現するので、それをデコードする。
+同じく、昼モードに切り替わるところでスジが消える（もしくは反転する）ので、手での微調整が必要。

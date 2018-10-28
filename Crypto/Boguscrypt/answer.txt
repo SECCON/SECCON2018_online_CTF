@@ -1,0 +1,4 @@
+﻿the file encryption is very easy - it's XOR - but challenge should get the encryption key with DNS Reverse lookup.
+I saved a DNS query packets in the PCAP file, because the query answer have possibility that the entry will change by DNS logics if query from internet.
+
+So, Challenger can find a query that reverse lookup of 127.0.0.2 from PCAP file, and decrypt the file with the result.

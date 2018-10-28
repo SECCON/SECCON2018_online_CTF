@@ -1,0 +1,59 @@
+1.Analyze the binary with your favorite dissassembler.
+2.There are only 3 imported functions.
+	GetCommandLineA
+	ExitProcess
+	MessageBoxA
+3.GetCommandLineA is the function to get the whole command line including the arguments.
+4.On the entry point function 0x401000, it passes the command line string and the value 0x22.
+
+ .text:00401000 start           proc near
+ .text:00401000
+ .text:00401000 var_4           = dword ptr -4
+ .text:00401000
+ .text:00401000                 push    ebp
+ .text:00401001                 mov     ebp, esp
+ .text:00401003                 push    esi
+ .text:00401004                 call    ds:GetCommandLineA
+ .text:0040100A                 mov     [ebp+var_4], eax
+ .text:0040100D                 push    eax             ;     <-------------- The result of GetCommandLineA
+ .text:0040100E                 push    22h ; '"'       ;     <-------------- The value 0x22
+ .text:00401010                 call    sub_401034      ;     <-------------- Next function
+ .text:00401015                 push    40h ; '@'       ; uType
+ .text:00401017                 push    offset Caption  ; "Congratz"
+ .text:0040101C                 push    offset Text     ; "You know the flag!"
+ .text:00401021                 push    0               ; hWnd
+ .text:00401023                 call    ds:MessageBoxA
+ .text:00401029                 call    ds:ExitProcess
+ .text:00401029 start           endp
+
+5.On the next function it compares the first letter of the command line string and the value 0x22.
+
+ .text:00401034 sub_401034      proc near               ; CODE XREF: start+10ªp
+ .text:00401034
+ .text:00401034 arg_0           = byte ptr  8
+ .text:00401034 arg_4           = dword ptr  0Ch
+ .text:00401034
+ .text:00401034                 push    ebp
+ .text:00401035                 mov     ebp, esp
+ .text:00401037                 push    esi
+ .text:00401038                 movzx   ecx, [ebp+arg_0]
+ .text:0040103C                 mov     edx, [ebp+arg_4]
+ .text:0040103F                 movzx   edx, byte ptr [edx]
+ .text:00401042                 cmp     ecx, edx      ;      <---------- comparison
+ .text:00401044                 jnz     loc_4018BB    ;      If it is not equal; go to the "Failed" routine.
+ .text:0040104A                 mov     ecx, 1
+ .text:0040104F                 mov     edx, [ebp+arg_4]
+ .text:00401052                 inc     edx           ;      <---------- inclement the pointer of the command line string
+ .text:00401053                 push    edx
+ .text:00401054                 push    43h ; 'C'     ;      <---------- push the next value 0x43 ("C")
+ .text:00401056                 call    sub_401060
+ .text:0040105B                 pop     esi
+ .text:0040105C                 mov     esp, ebp
+ .text:0040105E                 pop     ebp
+ .text:0040105F                 retn
+
+6.And the remaining functions have a same structure as the previous function.
+ We can pick every single value which is passed as a parameter to the next function.
+
+7.Then we got this string which is the exepected running path and argument.
+  "C:\Temp\SECCON2018Online.exe" SECCON{Runn1n6_P47h}

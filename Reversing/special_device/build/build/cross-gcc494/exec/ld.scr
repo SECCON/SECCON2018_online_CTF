@@ -1,0 +1,47 @@
+ENTRY("_start")
+
+SECTIONS
+{
+	/* for Motorola 68HC11 */
+	_.tmp = 0x40; . += 4;
+	_.xy = .; . += 4; _.z = .; . += 4;
+	/* for option -fno-omit-frame-pointer */
+	_.frame = .; . += 4;
+	/* without option -msoft-reg-count */
+	_.d1 = .; . += 4; _.d2 = .; . += 4;
+	_.d3 = .; . += 4; _.d4 = .; . += 4;
+
+	.text 0x1400 : {
+		*(.text .text.*)
+		_etext = .;
+	}
+
+	.rodata : {
+		*(.rodata .rodata.*)
+		_erodata = .;
+	}
+
+	. = ALIGN(0x400);
+	_gp = .;
+
+	.data : {
+		*(.data .data.*)
+		*(.sdata .sdata.*)
+		_edata = .;
+	}
+
+	.bss : {
+		*(.bss .bss.*)
+		*(.sbss .sbss.*)
+		*(.scommon)
+		*(COMMON)
+		_ebss = .;
+	}
+
+	.stack ALIGN(16) : {
+		. += 1024;
+		_estack = .;
+	}
+
+	_end = .;
+}

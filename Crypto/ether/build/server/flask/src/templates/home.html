@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="/static/signin.css" rel="stylesheet" id="bootstrap-css">
+  </head>
+  <body>
+
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+	<div class="panel panel-success">
+	  <div class="panel-heading"> Lottery </div>
+	  <div class="panel-body">
+	    <p>Welcome!! Here, you can challenge lottery embeded in Etherium. If you hit the mark, the flag will appear.</p>
+	    <p>You can deploy lottery contract with the button below. <i>Be patient. Mining may take one minute or so on.</i></p>
+	    <div class="text-right">
+	      <button type="button" class="btn btn-success btn-sm" onclick="claimETH()" id="claimETH"{% if gaveETH == True %} disabled{% endif %}>Claim ETH</button>
+	      <button type="button" class="btn btn-success btn-sm" onclick="deploy(1)" id="lv1_deploy"{% if lv1Addr != None %} disabled{% endif %}>Deploy Lv1</button>
+	      <button type="button" class="btn btn-success btn-sm" onclick="deploy(2)" id="lv2_deploy"{% if lv2Addr != None %} disabled{% endif %}>Deploy Lv2</button>
+	      <a class="btn btn-success btn-sm" data-toggle="collapse" href="#collapse" role="button" aria-expanded="false" aria-controls="collapse"> Your own client? </a>
+	    </div>
+	    <div class="collapse" id="collapse">
+	      <div class="card border-right-0">
+		<div class="card-body">
+		  <code>$ geth --datadir /path/to/ethereum-data init genesis.json</code><br><code>$ geth --datadir /path/to/ethereum-data --networkid=2994 --nodiscover console</code><br><a href="/connection">Configuration files</a>
+		</div>
+	      </div>
+	    </div>
+	    &nbsp;
+	    <div id="info" class="card">
+	      <div class="loader" id="info_loader"></div> 
+	      <table class="table" id="info_table" style="display: none;">
+		<tbody>
+		  <tr>
+		    <td>Wallet Address</td>
+		    <td> {{ accountAddr }} </td>
+		  </tr>
+		  <tr>
+		    <td>Balance</td>
+		    <td><div id="balance" style="display:inline;">LOADING</div> ETH</td>
+		  </tr>
+		</tbody>
+	      </table>
+	    </div>
+	    &nbsp;
+	    <div id="lv1" class="card"{% if lv1Addr == None %} style="display: none;"{% endif %}>
+	      <div class="loader" id="lv1_loader"></div> 
+	      <table class="table" id="lv1_table" style="display: none;">
+		<thead>
+		  <tr>
+		    <td><a href="/getCode/1" download="Gacha.sol">Lv.1</a></td>
+		    <td><button type="button" class="btn btn-success btn-sm" onclick="testLuck(1)">Test Luck!!</button></td>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr>
+		    <td>Played</td>
+		    <td><div id="lv1_played" style="display:inline;">LOADING</div> times</td>
+		  </tr>
+		  <tr>
+		    <td>Contract Address</td>
+		    <td><div id="lv1_contractAddr" style="display:inline;">LOADING</div></td>
+		  </tr>
+		  <tr>
+		    <td>Flag</td>
+		    <td><div id="lv1_flag" style="display:inline;">TRY HARDER</div></td>
+		  </tr>
+		</tbody>
+	      </table>
+	    </div>
+	    &nbsp;
+	    <div id="lv2" class="card"{% if lv2Addr == None %} style="display: none;"{% endif %}>
+	      <div class="loader" id="lv2_loader"></div> 
+	      <table class="table" id="lv2_table" style="display: none;">
+		<thead>
+		  <tr>
+		    <td><a href="/getCode/2" download="Gacha2.sol">Lv.2</a></td>
+		    <td><button type="button" class="btn btn-success btn-sm" onclick="testLuck(2)">Test Luck!!</button></td>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr>
+		    <td>Played</td>
+		    <td><div id="lv2_played" style="display:inline;">LOADING</div> times</td>
+		  </tr>
+		  <tr>
+		    <td>Contract Address</td>
+		    <td><div id="lv2_contractAddr" style="display:inline;">LOADING</div></td>
+		  </tr>
+		  <tr>
+		  <tr>
+		    <td>Flag</td>
+		    <td><div id="lv2_flag" style="display:inline;">TRY HARDER</div></td>
+		  </tr>
+		</tbody>
+	      </table>
+	    </div>
+
+	  </div>
+	  <div class="col-md-3"></div>
+	</div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/static/lottery.js"></script>
+  </body>
+</html>

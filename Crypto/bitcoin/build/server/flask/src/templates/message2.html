@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+  <head>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Electrum Kamuy</title>
+    <link rel='stylesheet' id='hestia-clients-bar-css'  href='/static/wp-content/plugins/themeisle-companion/obfx_modules/companion-legacy/assets/css/hestia/clients-bar.css' type='text/css' media='all' />
+    <link rel='stylesheet' id='dashicons-css'  href='/static/wp-includes/css/dashicons.min.css' type='text/css' media='all' />
+    <link rel='stylesheet' id='obfx-module-pub-css-menu-icons-1-css'  href='/static/wp-content/plugins/themeisle-companion/obfx_modules/menu-icons/css/public.css' type='text/css' media='all' />
+    <link rel='stylesheet' id='bootstrap-css'  href='/static/wp-content/themes/hestia/assets/bootstrap/css/bootstrap.min.css' type='text/css' media='all' />
+    <link rel='stylesheet' id='hestia-font-sizes-css'  href='/static/wp-content/themes/hestia/assets/css/font-sizes.css' type='text/css' media='all' />
+    <link rel='stylesheet' id='hestia_style-css'  href='/static/wp-content/themes/hestia/style.css' type='text/css' media='all' />
+    <style id='hestia_style-inline-css' type='text/css'>
+      .hestia-top-bar, .hestia-top-bar .widget.widget_shopping_cart .cart_list {
+      background-color: #363537
+      }
+      .hestia-top-bar .widget .label-floating input[type=search]:-webkit-autofill {
+      -webkit-box-shadow: inset 0 0 0px 9999px #363537
+      }.hestia-top-bar, .hestia-top-bar .widget .label-floating input[type=search], .hestia-top-bar .widget.widget_search form.form-group:before, .hestia-top-bar .widget.widget_product_search form.form-group:before, .hestia-top-bar .widget.widget_shopping_cart:before {
+      color: #ffffff
+      } 
+      .hestia-top-bar .widget .label-floating input[type=search]{
+      -webkit-text-fill-color:#ffffff !important 
+      }.hestia-top-bar a, .hestia-top-bar .top-bar-nav li a {
+      color: #ffffff
+      }.hestia-top-bar a:hover, .hestia-top-bar .top-bar-nav li a:hover {
+      color: #eeeeee
+      }
+      
+      a, 
+      .navbar .dropdown-menu li:hover > a,
+      .navbar .dropdown-menu li:focus > a,
+      .navbar .dropdown-menu li:active > a,
+      .navbar.navbar-not-transparent .nav > li:not(.btn).on-section > a, 
+      .navbar.navbar-not-transparent .nav > li.on-section:not(.btn) > a, 
+      .navbar.navbar-not-transparent .nav > li.on-section:not(.btn):hover > a, 
+      .navbar.navbar-not-transparent .nav > li.on-section:not(.btn):focus > a, 
+      .navbar.navbar-not-transparent .nav > li.on-section:not(.btn):active > a, 
+      body:not(.home) .navbar-default .navbar-nav > .active:not(.btn) > a,
+      body:not(.home) .navbar-default .navbar-nav > .active:not(.btn) > a:hover,
+      body:not(.home) .navbar-default .navbar-nav > .active:not(.btn) > a:focus,
+      a:hover, 
+      .card-blog a.moretag:hover, 
+      .card-blog a.more-link:hover, 
+      .widget a:hover {
+      color:#e96656;
+      }
+      
+      .pagination span.current, .pagination span.current:focus, .pagination span.current:hover {
+      border-color:#e96656
+      }
+      
+      button,
+      button:hover,           
+      input[type="button"],
+      input[type="button"]:hover,
+      input[type="submit"],
+      input[type="submit"]:hover,
+      input#searchsubmit, 
+      .pagination span.current, 
+      .pagination span.current:focus, 
+      .pagination span.current:hover,
+      .btn.btn-primary,
+      .btn.btn-primary:link,
+      .btn.btn-primary:hover, 
+      .btn.btn-primary:focus, 
+      .btn.btn-primary:active, 
+      .btn.btn-primary.active, 
+      .btn.btn-primary.active:focus, 
+      .btn.btn-primary.active:hover,
+      .btn.btn-primary:active:hover, 
+      .btn.btn-primary:active:focus, 
+      .btn.btn-primary:active:hover,
+      .hestia-sidebar-open.btn.btn-rose,
+      .hestia-sidebar-close.btn.btn-rose,
+      .hestia-sidebar-open.btn.btn-rose:hover,
+      .hestia-sidebar-close.btn.btn-rose:hover,
+      .hestia-sidebar-open.btn.btn-rose:focus,
+      .hestia-sidebar-close.btn.btn-rose:focus,
+      .label.label-primary,
+      .hestia-work .portfolio-item:nth-child(6n+1) .label,
+      .nav-cart .nav-cart-content .widget .buttons .button{
+      background-color: #e96656;
+      }
+      
+      @media (max-width: 768px) { 
+      
+      .navbar-default .navbar-nav>li>a:hover,
+      .navbar-default .navbar-nav>li>a:focus,
+      .navbar .navbar-nav .dropdown .dropdown-menu li a:hover,
+      .navbar .navbar-nav .dropdown .dropdown-menu li a:focus,
+      .navbar button.navbar-toggle:hover,
+      .navbar .navbar-nav li:hover > a i {
+      color: #e96656;
+      }
+      }
+      
+      button,
+      .button,
+      input[type="submit"], 
+      input[type="button"], 
+      .btn.btn-primary,
+      .hestia-sidebar-open.btn.btn-rose,
+      .hestia-sidebar-close.btn.btn-rose {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(233,102,86,0.14),0 3px 1px -2px rgba(233,102,86,0.2),0 1px 5px 0 rgba(233,102,86,0.12);
+      box-shadow: 0 2px 2px 0 rgba(233,102,86,0.14),0 3px 1px -2px rgba(233,102,86,0.2),0 1px 5px 0 rgba(233,102,86,0.12);
+      }
+      
+      .card .header-primary, .card .content-primary {
+      background: #e96656;
+      }
+      
+      .button:hover,
+      button:hover,
+      input[type="submit"]:hover,
+      input[type="button"]:hover,
+      input#searchsubmit:hover, 
+      .pagination span.current, 
+      .btn.btn-primary:hover, 
+      .btn.btn-primary:focus, 
+      .btn.btn-primary:active, 
+      .btn.btn-primary.active, 
+      .btn.btn-primary:active:focus, 
+      .btn.btn-primary:active:hover, 
+      .hestia-sidebar-open.btn.btn-rose:hover,
+      .hestia-sidebar-close.btn.btn-rose:hover,
+      .pagination span.current:hover{
+      -webkit-box-shadow: 0 14px 26px -12pxrgba(233,102,86,0.42),0 4px 23px 0 rgba(0,0,0,0.12),0 8px 10px -5px rgba(233,102,86,0.2);
+      box-shadow: 0 14px 26px -12px rgba(233,102,86,0.42),0 4px 23px 0 rgba(0,0,0,0.12),0 8px 10px -5px rgba(233,102,86,0.2);
+      color: #fff;
+      }
+      
+      .form-group.is-focused .form-control {
+      background-image: -webkit-gradient(linear,left top, left bottom,from(#e96656),to(#e96656)),-webkit-gradient(linear,left top, left bottom,from(#d2d2d2),to(#d2d2d2));
+      background-image: -webkit-linear-gradient(#e96656),to(#e96656),-webkit-linear-gradient(#d2d2d2,#d2d2d2);
+      background-image: linear-gradient(#e96656),to(#e96656),linear-gradient(#d2d2d2,#d2d2d2);
+      }
+      
+      .navbar:not(.navbar-transparent) li:not(.btn):hover > a,
+      .navbar.full-screen-menu.navbar-transparent li:not(.btn):hover > a,
+      .navbar.full-screen-menu .navbar-toggle:hover,
+      .navbar:not(.navbar-transparent) .nav-cart:hover, 
+      .navbar:not(.navbar-transparent) .hestia-toggle-search:hover {
+      color:#e96656}
+      
+      .header-filter-gradient { 
+      background: linear-gradient(45deg, rgba(168,29,132,1) 0%, rgb(234,57,111) 100%); 
+      } 
+      h1, h2, h3, h4, h5, h6, .hestia-title, .hestia-title.title-in-content, p.meta-in-content , .info-title, .card-title,
+      .page-header.header-small .hestia-title, .page-header.header-small .title, .widget h5, .hestia-title, 
+      .title, .card-title, .info-title, .footer-brand, .footer-big h4, .footer-big h5, .media .media-heading, 
+      .carousel h1.hestia-title, .carousel h2.title, 
+      .carousel span.sub-title, .woocommerce.single-product h1.product_title, .woocommerce section.related.products h2, .hestia-about h1, .hestia-about h2, .hestia-about h3, .hestia-about h4, .hestia-about h5 {
+      font-family: Montserrat;
+      }
+      body, ul, .tooltip-inner {
+      font-family: Montserrat;
+      }
+
+      .page-template-builder-fullwidth-std .header > .elementor {
+      padding-top: 70px;
+      }
+
+    </style>
+    <link rel='stylesheet' id='hestia-google-font-montserrat-css'  href='//fonts.googleapis.com/css?family=Montserrat%3A300%2C400%2C500%2C700&#038;subset=latin&#038;ver=4.9.8' type='text/css' media='all' />
+    <script type='text/javascript' src='/static/wp-includes/js/jquery/jquery.js'></script>
+    <script type='text/javascript' src='/static/wp-includes/js/jquery/jquery-migrate.min.js'></script>
+    <script type='text/javascript'>
+      /* <![CDATA[ */
+var pf = {"spam":{"label":"I'm human!","value":"f1d75dd50a"}};
+/* ]]> */
+    </script>
+    <script type='text/javascript' src='/static/wp-content/plugins/pirate-forms/public/js/custom-spam.js'></script>
+    <meta name="generator" content="WordPress 4.9.8" />
+    <link rel="canonical" href="static/" />
+    <link rel='shortlink' href='/static/' />
+    <style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+  </head>
+
+  <body class="home page-template-default page page-id-6 blog-post">
+    <div class="wrapper ">
+      <header class="header ">
+	<nav class="navbar navbar-default navbar-fixed-top navbar-color-on-scroll navbar-transparent hestia_left">
+	  <div class="container">
+	    <div class="navbar-header">
+	      <div class="title-logo-wrapper">
+		<a class="navbar-brand" href="static/"
+		   title="Electrum Kamuy">
+		  <p>Electrum Kamuy</p></a>
+	      </div>
+	    </div>
+	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navigation">
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	      <span class="sr-only">Toggle Navigation</span>
+	    </button>
+	  </div>
+
+	</nav>
+	<div style="display: none"></div>		</header>
+      <div id="carousel-hestia-generic" class="carousel slide" data-ride="carousel">
+	<div class="carousel slide" data-ride="carousel">
+	  <div class="carousel-inner">
+	    
+	    <div class="item active">
+	      <div class="page-header">
+		
+		<div class="container">
+		  <div class="row hestia-big-title-content">
+		    <div class="
+				big-title-slider-content text-left col-md-7 		">
+		      <h1 class="hestia-title">Thank you for getting in touch!</h1>
+		      <span class="sub-title">I will check the message ASAP!!</span>
+		    </div>
+		    <div class="big-title-sidebar-wrapper  col-md-5  hestia-slider-alignment-left "></div>					</div>
+		</div><!-- /.container -->
+
+		<div class="header-filter"
+		     style="background-image: url(/static/wp-content/uploads/2018/09/animal-cold-color-416118.jpg)"				></div><!-- /.header-filter -->
+	      </div><!-- /.page-header -->
+	    </div>
+	  </div>
+	</div>
+      </div>
+      
+
+      <!-- -->
+      <form
+	method="post"
+	action="/post"
+	enctype="application/x-www-form-urlencoded"
+	class="pirate_forms  form_honeypot-on wordpress-nonce-on pirate-forms-contact-message-on pirate-forms-contact-submit-on pirate_forms_from_form-on"
+	>
+	<div class="pirate_forms_three_inputs_wrap ">
+	</div>
+	<div class="col-xs-12 form_field_wrap contact_message_wrap col-xs-12 contact_message_wrap pirate_forms_three_inputs form_field_wrap">
+	  <textarea readonly rows="5" cols="30" class="form-control" id="pirate-forms-contact-message" name="pirate-forms-contact-message" class="" placeholder="Your message" required oninvalid="this.setCustomValidity('Enter your question or comment')" onchange="this.setCustomValidity('')" >{{ message|safe }}</textarea>
+	</div>
+      <!-- -->
+
+    </div>
+    <link rel='stylesheet' id='pirate_forms_front_styles-css'  href='/static/wp-content/plugins/pirate-forms/public/css/front.css' type='text/css' media='all' />
+    <script type='text/javascript' src='/static/wp-content/themes/hestia/assets/bootstrap/js/bootstrap.min.js'></script>
+    <script type='text/javascript' src='/static/wp-content/themes/hestia/assets/js/material.js'></script>
+    <script type='text/javascript' src='/static/wp-includes/js/jquery/ui/core.min.js'></script>
+    <script type='text/javascript'>
+      /* <![CDATA[ */
+var requestpost = {"ajaxurl":"","disable_autoslide":""};
+/* ]]> */
+    </script>
+    <script type='text/javascript' src='/static/wp-content/themes/hestia/assets/js/scripts.js'></script>
+    <script type='text/javascript'>
+      /* <![CDATA[ */
+var pirateFormsObject = {"errors":"","rest":{"submit":{"url":""},"nonce":"68aeea5d9b"}};
+/* ]]> */
+    </script>
+    <script type='text/javascript' src='/static/wp-content/plugins/pirate-forms/public/js/scripts.js'></script>
+  </body>
+</html>

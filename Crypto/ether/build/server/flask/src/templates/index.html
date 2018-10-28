@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="/static/signin.css" rel="stylesheet" id="bootstrap-css">
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+	<div class="col-md-3"></div>
+        <div class="col-md-6">
+          <div class="panel with-nav-tabs panel-info">
+            <div class="panel-heading">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#login" data-toggle="tab"> Login </a></li>
+                <li><a href="#signup" data-toggle="tab"> Signup </a></li>
+              </ul>
+            </div>
+
+            <div class="panel-body">
+              <div class="tab-content">
+
+                  <div id="login" class="tab-pane fade in active register">
+		<form action="/signin" method="POST">
+                    <div class="container-fluid">
+                      <div class="row">
+			<h2 class="text-center" style="color: #5cb85c;"> <strong> Login  </strong></h2><hr />
+
+			<div class="row">
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <div class="input-group">
+				<div class="input-group-addon">
+                                  <span class="glyphicon glyphicon-user"></span>
+				</div>
+				<input type="text" placeholder="Account Address" name="accountAddr" class="form-control" required>
+                              </div>
+                            </div>
+                          </div>
+			</div>
+
+			<div class="row">
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <div class="input-group">
+				<div class="input-group-addon">
+                                  <span class="glyphicon glyphicon-lock"></span>
+				</div>
+				<input type="password" placeholder="Password" name="pass" class="form-control" required>
+                              </div>
+                            </div>
+                          </div>
+			</div>
+
+			<hr />
+			<div class="row">
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <button type="submit" class="btn btn-success btn-block btn-lg"> Login </button>
+                          </div>
+			</div>
+                      </div>
+                    </div> 
+		</form>
+                  </div>
+
+
+                  <div id="signup" class="tab-pane fade">
+		    <form action="/signup" method="POST">
+                    <div class="container-fluid">
+                      <div class="row" id="register-form">
+			<h2 class="text-center" style="color: #f0ad4e;"> <Strong> Register </Strong></h2> <hr />
+
+			<div class="row">
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <div class="input-group">
+				<div class="input-group-addon iga1">
+                                  <span class="glyphicon glyphicon-user"></span>
+				</div>
+				<input type="text" class="form-control" placeholder="Account Address" name="accountAddr" disabled>
+                              </div>
+                            </div>
+                          </div>
+			</div>
+
+			<div class="row">
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <div class="input-group">
+				<div class="input-group-addon iga1">
+                                  <span class="glyphicon glyphicon-lock"></span>
+				</div>
+				<input type="password" class="form-control" placeholder="Enter Password" name="pass" required>
+                              </div>
+                            </div>
+                          </div>
+			</div>
+			<hr>
+			<div class="row">
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <button type="submit" class="btn btn-lg btn-block btn-warning" onclick="circle();"> Register</button>
+                            </div>
+                          </div>
+			</div>
+                      </div>
+                    </div>
+		    </form>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+	</div>
+	<div class="col-md-3"></div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+      function circle(){ $("#register-form").append("<div id='loadingBG'><div class='circle'></div></div>"); }
+    </script>
+  </body>
+</html>

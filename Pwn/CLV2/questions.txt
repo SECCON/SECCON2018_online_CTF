@@ -1,0 +1,11 @@
+[Challenge Title]
+
+CLV2
+
+
+[Challenge document]
+
+Pwn me, and Prove yourself
+
+
+nc clv2.pwn.seccon.jp 31337

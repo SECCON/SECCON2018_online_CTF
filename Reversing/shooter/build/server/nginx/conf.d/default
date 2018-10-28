@@ -1,0 +1,11 @@
+server {
+  listen *:80 default_server;
+  server_name _;
+
+  access_log /var/log/nginx/default_access.log;
+  error_log /var/log/nginx/default_error.log;
+
+  location / {
+    return 404;
+  }
+}

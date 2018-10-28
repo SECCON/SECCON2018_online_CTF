@@ -1,0 +1,17 @@
+●概要
+　Windows OSで記録されるUSNジャーナルを解析し、ファイル名の変更された履歴を追い、
+変更されたファイル名をつなぐとフラグとなる。
+
+●内容
+　１　問題の「J.zip」ファイルを解凍した「J」ファイルをusn_analytics等で解析
+　　　usn_analytics: http://www.kazamiya.net/usn_analytics
+
+　２　整形したUSNジャーナルのうち、ReasonをCREATE（ファイルの作成）とNEWNAME（ファイル名の変更）
+　３　FileIDが同じFileIDであれば、同じファイルであるため、FileIDに着目しながらFileNameを見ていく
+　４　FileID 60666で、2018/9/29  16:54:38にSEC.txtが作成されているのがわかる
+　５　続けて、同じFileID 60666で、CON{.txt、F0r.txt、ensic.txt、s.txt、_usnjrnl.txt、2018}.txt
+　　　とファイル名が変更されているのがわかる
+　６　変更されたファイル名をつなぐと、SECCON{F0rensics_usnjrnl2018}となる
+
+●その他
+　J.zipにしているのは、ファイルサイズを小さくするためだけです。

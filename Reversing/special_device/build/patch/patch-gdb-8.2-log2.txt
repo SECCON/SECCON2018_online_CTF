@@ -1,0 +1,26 @@
+--- sim/common/dv-cfi.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/common/dv-cfi.c	2018-09-25 23:43:57.494099000 +0900
+@@ -573,6 +573,23 @@
+                  max: 1µs, 1ms, 1ms, not supported
+ 
+   TODO: Verify user args are valid (e.g. voltage is 8 bits).  */
++static unsigned long _log2ul(unsigned long x)
++{
++  unsigned long result = 0;
++  while ((x >>= 1) != 0) {
++    result++;
++  }
++  return result;
++}
++#if 1
++#define log2(x) _log2ul(x)
++#else /* compatible with original log2() */
++static double _log2d(double x)
++{
++  return _log2ul(x);
++}
++#define log2(x) _log2d(x)
++#endif
+ static void
+ attach_cfi_regs (struct hw *me, struct cfi *cfi)
+ {

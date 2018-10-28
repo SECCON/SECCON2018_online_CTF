@@ -1,0 +1,17 @@
+■ 環境構築方法
+
+・以下のツールによりクロスビルド環境を構築
+  http://kozos.jp/books/asm/cross-gcc494-v1.0.tgz
+
+  (構築例)
+  $ tar xvzf cross-gcc494-v1.0.tgz
+  $ cd cross-gcc494
+  $ vi config.sh (modiry install_dir and makeopt)
+  $ cd toolchain
+  $ ./fetch.sh
+  $ ./setup.sh
+  $ cd ../build
+  $ ./setup-all.sh
+  $ ./build-install-clean-all.sh aarch64-elf
+
+■ おしまい

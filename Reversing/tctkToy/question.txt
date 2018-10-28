@@ -1,0 +1,8 @@
+[Challenge Title]
+tctkToy
+
+[Challenge document]
+The tctkToy was a fragile Windows application toy.
+Reverse and repair it in order to work well.
+SUPPORT: Recommend using Windows10 machine to run successfully.
+

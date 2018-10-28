@@ -1,0 +1,508 @@
+[EN]
+------
+Challenge Overview:
+
+- A problem that if you add your own device file (random number generation device) to AArch 64 and execute it, you can execute normally and obtain the flag.
+
+- To add advanced security functions, add special device files,
+  There is an idea of. As an exercise, an example is shown in which a pseudo device file of random number generation is added to generate a key.
+
+- It can be executed with the simulator attached to GDB.
+  However, since it uses the pseudo device file added independently, original file can not be opened (rather than the system call ABI in the first place), so the system call is invalid during execution.
+
+- If the pseudo device file of random number generation can be opened normally, random numbers are generated from the fixed SEED, and the flag is restored and output.
+
+- Flag is obtained by installing additional correspondence of pseudo device file in the simulator attached to GDB or by understanding the operation of pseudo device file and analyzing program · guess operation.
+
+- The algorithm of random number generation uses xorshift (64 bit).
+  Since it is a known algorithm, implementation is possible if the algorithm is known.
+
+Estimated solution:
+
+- Execution file is provided.
+  Since the architecture is unknown, firstly, the architecture is known from the executable file.
+
+- Once the architecture is specified, disassemble and analyze the machine language code.
+
+- If you run it with GDB simulator, operation stops due to invalid system call at the open position of pseudo device file.
+
+- Since it is / dev / xorshift64 when looking at the file name which is open, it can be inferred that it is a pseudo device which generates random numbers by the algorithm of xorshift64.
+  The method of giving seeds and obtaining the random number value can be inferred from the disassembling result of the machine language code.
+
+- Modify the GDB simulator from the obtained information and add correspondence of the pseudo device file. When executed with a modified simulator, a fixed SEED is given, a random number is obtained from the pseudo device file, the flag is restored and outputted.
+
+- However, be careful with the simulator for AArch64 of the original GDB because the ABI of the system call is different. (It is close to Linux ABI)
+  Therefore, it is necessary to adjust the ABI of the system call.
+  In addition, since system call processing such as open () / read () / write () is not sufficient in the first place, it is necessary to implement it.
+
+Below is an example implementation of a pseudo device file
+----------------------------------------------------------------
+--- sim/aarch64/simulator.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/aarch64/simulator.c	2018-10-18 23:09:32.641737000 +0900
+@@ -13754,6 +13754,48 @@
+ #define AngelSVC_Reason_ReportException 0x18
+ #define AngelSVC_Reason_Elapsed         0x30
+ 
++#define RANDOM_DEVICE
++#ifdef RANDOM_DEVICE
++
++void random32_init(uint32_t seed);
++uint32_t get_random32_value(void);
++
++static uint32_t random32_value = 2463534242U;
++
++void random32_init(uint32_t seed)
++{
++  random32_value = seed;
++}
++
++uint32_t get_random32_value(void)
++{
++  /* xorshift (32bit) */
++  random32_value = random32_value ^ (random32_value << 13);
++  random32_value = random32_value ^ (random32_value >> 17);
++  random32_value = random32_value ^ (random32_value << 15);
++  return random32_value;
++}
++
++void random64_init(uint64_t seed);
++uint64_t get_random64_value(void);
++
++static uint64_t random64_value = 88172645463325252ULL;
++
++void random64_init(uint64_t seed)
++{
++  random64_value = seed;
++}
++
++uint64_t get_random64_value(void)
++{
++  /* xorshift (64bit) */
++  random64_value = random64_value ^ (random64_value << 13);
++  random64_value = random64_value ^ (random64_value >>  7);
++  random64_value = random64_value ^ (random64_value << 17);
++  return random64_value;
++}
++
++#endif
+ 
+ static void
+ handle_halt (sim_cpu *cpu, uint32_t val)
+@@ -13769,7 +13811,11 @@
+     }
+ 
+   /* We have encountered an Angel SVC call.  See if we can process it.  */
++#ifndef RANDOM_DEVICE
+   switch (aarch64_get_reg_u32 (cpu, 0, NO_SP))
++#else
++  switch (aarch64_get_reg_u32 (cpu, 8, NO_SP))
++#endif
+     {
+     case AngelSVC_Reason_HeapInfo:
+       {
+@@ -13796,6 +13842,7 @@
+       break;
+ 
+     case AngelSVC_Reason_Open:
++#ifndef RANDOM_DEVICE
+       {
+ 	/* Get the pointer  */
+ 	/* uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);.  */
+@@ -13806,14 +13853,51 @@
+ 
+ 	TRACE_SYSCALL (cpu, " AngelSVC: Open file %d", fd - 1);
+       }
++#else
++      {
++	uint64_t ptr  = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t flag = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t mode = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	char path[64];
++	int fd, i;
++
++	fprintf(stderr, "Open: %08x, %d, %d\n", (int)ptr, (int)flag, (int)mode);
++
++	for (i = 0;; i++) {
++	  path[i] = aarch64_get_mem_u8 (cpu, ptr + i);
++	  if (path[i] == '\0')
++	    break;
++	}
++
++	if (!strcmp(path, "/dev/xorshift32"))
++	  fd = 3;
++	else if (!strcmp(path, "/dev/xorshift64"))
++	  fd = 4;
++	else
++	  break;
++	fprintf(stderr, "File: %s\n", path);
++
++	result = fd;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_Close:
++#ifndef RANDOM_DEVICE
+       {
+ 	uint64_t fh = aarch64_get_reg_u64 (cpu, 1, SP_OK);
+ 	TRACE_SYSCALL (cpu, " AngelSVC: Close file %d", (int) fh);
+ 	result = 0;
+       }
++#else
++      {
++	uint64_t fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	fprintf(stderr, "Close: %d\n", (int)fd);
++	result = 0;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_Errno:
+@@ -13853,6 +13937,7 @@
+       break;
+ 
+     case AngelSVC_Reason_Write:
++#ifndef RANDOM_DEVICE
+       {
+ 	/* Get the pointer  */
+ 	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
+@@ -13893,6 +13978,41 @@
+ 			     sim_stopped, SIM_SIGABRT);
+ 	  }
+       }
++#else
++      {
++	uint64_t  fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t len = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	uint32_t value32;
++	uint64_t value64;
++
++	if (fd == 1) {
++	  printf ("%.*s", (int) len, aarch64_get_mem_ptr (cpu, ptr));
++	  break;
++	}
++
++	fprintf(stderr, "Write: %d, %08x, %d\n", (int)fd, (int)ptr, (int)len);
++
++	if (fd == 3) { /* xorshift32 */
++	  if (len != sizeof(value32))
++	    break;
++	  value32 = aarch64_get_mem_u32 (cpu, ptr);
++	  fprintf(stderr, "Seed: %u\n", value32);
++	  random32_init(value32);
++	} else if (fd == 4) { /* xorshift64 */
++	  if (len != sizeof(value64))
++	    break;
++	  value64 = aarch64_get_mem_u64 (cpu, ptr);
++	  fprintf(stderr, "Seed: %lu\n", value64);
++	  random64_init(value64);
++	} else {
++	  break;
++	}
++
++	result = len;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_ReportException:
+@@ -13917,6 +14037,37 @@
+       break;
+ 
+     case AngelSVC_Reason_Read:
++#ifdef RANDOM_DEVICE
++      {
++	uint64_t  fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t len = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	uint32_t value32;
++	uint64_t value64;
++
++	fprintf(stderr, "Read: %d, %08x, %d\n", (int)fd, (int)ptr, (int)len);
++
++	if (fd == 3) { /* xorshift32 */
++	  if (len != sizeof(value32))
++	    break;
++	  value32 = get_random32_value();
++	  fprintf(stderr, "Value: %08x\n", value32);
++	  aarch64_set_mem_u32 (cpu, ptr, value32);
++	} else if (fd == 4) { /* xorshift64 */
++	  if (len != sizeof(value64))
++	    break;
++	  value64 = get_random64_value();
++	  fprintf(stderr, "Value: %16lx\n", value64);
++	  aarch64_set_mem_u64 (cpu, ptr, value64);
++	} else {
++	  break;
++	}
++
++	result = len;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++      break;
++#endif
+     case AngelSVC_Reason_FLen:
+     case AngelSVC_Reason_Seek:
+     case AngelSVC_Reason_Remove:
+----------------------------------------------------------------
+
+
+
+
+[JP]
+------
+■ 問題の概要
+
+・AArch64に対して，独自のデバイスファイル(乱数発生デバイス)を追加して実行すると正常実行できてフラグが得られる，という問題．
+
+・高度なセキュリティ機能を実現するために，特殊なデバイスファイルを追加する，というアイディアがある．その練習として，乱数生成の疑似デバイスファイルを追加して鍵生成する例を示している．
+
+・GDB付属のシミュレータで実行できる．
+  しかし独自に追加した疑似デバイスファイルを利用しており，オリジナルではファイルをオープンできない(というより，そもそもシステムコールのABIが異なる)ため，実行中にシステムコール不正となる．
+
+・乱数発生の疑似デバイスファイルが正常にオープンできれば，固定のSEEDから乱数発生させ，フラグを復元して出力する．
+
+・GDB付属のシミュレータに疑似デバイスファイルの対応追加実装するか，もしくは疑似デバイスファイルの動作を理解してプログラムを解析・動作推測することで，フラグが得られる．
+
+・乱数生成のアルゴリズムは xorshift (64bit) を使用．
+  既知のアルゴリズムであるため，アルゴリズムがわかれば実装は可能．
+
+■ 想定解法
+
+・実行ファイルが提供される．
+  アーキテクチャが不明なので，まずは実行ファイルからアーキテクチャを知る．
+
+・アーキテクチャが特定できたら，機械語コードを逆アセンブルし解析する．
+
+・GDBのシミュレータで実行すると，疑似デバイスファイルのオープンの位置でシステムコール不正で動作停止する．
+
+・オープンしているファイル名を見ると /dev/xorshift64 であるため，xorshift64のアルゴリズムで乱数発生する疑似デバイスであることが推測できる．
+  種の与えかたや乱数値の取得方法は，機械語コードの逆アセンブル結果から推測できる．
+
+・得られた情報からGDBのシミュレータを修正し疑似デバイスファイルの対応を追加する．修正版シミュレータで実行すると，固定のSEEDが与えられ，疑似デバイスファイルから乱数が得られてフラグが復元され出力される．
+
+・ただしオリジナルのGDBのAArch64向けシミュレータとは，システムコールのABIを異なるものにしているので注意．(LinuxのABIに近くしてある)
+  このためシステムコールのABIも合わせる必要がある．
+  またそもそもopen()/read()/write()などのシステムコール処理が不十分なので，実装する必要がある．
+
+以下は疑似デバイスファイルの実装例
+(gdb-8.2に対するパッチ．ただしprintf()の書式指定子でlongが64ビットであることを期待しているので，64ビットホスト向け)
+----------------------------------------------------------------
+--- sim/aarch64/simulator.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/aarch64/simulator.c	2018-10-18 23:09:32.641737000 +0900
+@@ -13754,6 +13754,48 @@
+ #define AngelSVC_Reason_ReportException 0x18
+ #define AngelSVC_Reason_Elapsed         0x30
+ 
++#define RANDOM_DEVICE
++#ifdef RANDOM_DEVICE
++
++void random32_init(uint32_t seed);
++uint32_t get_random32_value(void);
++
++static uint32_t random32_value = 2463534242U;
++
++void random32_init(uint32_t seed)
++{
++  random32_value = seed;
++}
++
++uint32_t get_random32_value(void)
++{
++  /* xorshift (32bit) */
++  random32_value = random32_value ^ (random32_value << 13);
++  random32_value = random32_value ^ (random32_value >> 17);
++  random32_value = random32_value ^ (random32_value << 15);
++  return random32_value;
++}
++
++void random64_init(uint64_t seed);
++uint64_t get_random64_value(void);
++
++static uint64_t random64_value = 88172645463325252ULL;
++
++void random64_init(uint64_t seed)
++{
++  random64_value = seed;
++}
++
++uint64_t get_random64_value(void)
++{
++  /* xorshift (64bit) */
++  random64_value = random64_value ^ (random64_value << 13);
++  random64_value = random64_value ^ (random64_value >>  7);
++  random64_value = random64_value ^ (random64_value << 17);
++  return random64_value;
++}
++
++#endif
+ 
+ static void
+ handle_halt (sim_cpu *cpu, uint32_t val)
+@@ -13769,7 +13811,11 @@
+     }
+ 
+   /* We have encountered an Angel SVC call.  See if we can process it.  */
++#ifndef RANDOM_DEVICE
+   switch (aarch64_get_reg_u32 (cpu, 0, NO_SP))
++#else
++  switch (aarch64_get_reg_u32 (cpu, 8, NO_SP))
++#endif
+     {
+     case AngelSVC_Reason_HeapInfo:
+       {
+@@ -13796,6 +13842,7 @@
+       break;
+ 
+     case AngelSVC_Reason_Open:
++#ifndef RANDOM_DEVICE
+       {
+ 	/* Get the pointer  */
+ 	/* uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);.  */
+@@ -13806,14 +13853,51 @@
+ 
+ 	TRACE_SYSCALL (cpu, " AngelSVC: Open file %d", fd - 1);
+       }
++#else
++      {
++	uint64_t ptr  = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t flag = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t mode = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	char path[64];
++	int fd, i;
++
++	fprintf(stderr, "Open: %08x, %d, %d\n", (int)ptr, (int)flag, (int)mode);
++
++	for (i = 0;; i++) {
++	  path[i] = aarch64_get_mem_u8 (cpu, ptr + i);
++	  if (path[i] == '\0')
++	    break;
++	}
++
++	if (!strcmp(path, "/dev/xorshift32"))
++	  fd = 3;
++	else if (!strcmp(path, "/dev/xorshift64"))
++	  fd = 4;
++	else
++	  break;
++	fprintf(stderr, "File: %s\n", path);
++
++	result = fd;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_Close:
++#ifndef RANDOM_DEVICE
+       {
+ 	uint64_t fh = aarch64_get_reg_u64 (cpu, 1, SP_OK);
+ 	TRACE_SYSCALL (cpu, " AngelSVC: Close file %d", (int) fh);
+ 	result = 0;
+       }
++#else
++      {
++	uint64_t fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	fprintf(stderr, "Close: %d\n", (int)fd);
++	result = 0;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_Errno:
+@@ -13853,6 +13937,7 @@
+       break;
+ 
+     case AngelSVC_Reason_Write:
++#ifndef RANDOM_DEVICE
+       {
+ 	/* Get the pointer  */
+ 	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
+@@ -13893,6 +13978,41 @@
+ 			     sim_stopped, SIM_SIGABRT);
+ 	  }
+       }
++#else
++      {
++	uint64_t  fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t len = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	uint32_t value32;
++	uint64_t value64;
++
++	if (fd == 1) {
++	  printf ("%.*s", (int) len, aarch64_get_mem_ptr (cpu, ptr));
++	  break;
++	}
++
++	fprintf(stderr, "Write: %d, %08x, %d\n", (int)fd, (int)ptr, (int)len);
++
++	if (fd == 3) { /* xorshift32 */
++	  if (len != sizeof(value32))
++	    break;
++	  value32 = aarch64_get_mem_u32 (cpu, ptr);
++	  fprintf(stderr, "Seed: %u\n", value32);
++	  random32_init(value32);
++	} else if (fd == 4) { /* xorshift64 */
++	  if (len != sizeof(value64))
++	    break;
++	  value64 = aarch64_get_mem_u64 (cpu, ptr);
++	  fprintf(stderr, "Seed: %lu\n", value64);
++	  random64_init(value64);
++	} else {
++	  break;
++	}
++
++	result = len;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_ReportException:
+@@ -13917,6 +14037,37 @@
+       break;
+ 
+     case AngelSVC_Reason_Read:
++#ifdef RANDOM_DEVICE
++      {
++	uint64_t  fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t len = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	uint32_t value32;
++	uint64_t value64;
++
++	fprintf(stderr, "Read: %d, %08x, %d\n", (int)fd, (int)ptr, (int)len);
++
++	if (fd == 3) { /* xorshift32 */
++	  if (len != sizeof(value32))
++	    break;
++	  value32 = get_random32_value();
++	  fprintf(stderr, "Value: %08x\n", value32);
++	  aarch64_set_mem_u32 (cpu, ptr, value32);
++	} else if (fd == 4) { /* xorshift64 */
++	  if (len != sizeof(value64))
++	    break;
++	  value64 = get_random64_value();
++	  fprintf(stderr, "Value: %16lx\n", value64);
++	  aarch64_set_mem_u64 (cpu, ptr, value64);
++	} else {
++	  break;
++	}
++
++	result = len;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++      break;
++#endif
+     case AngelSVC_Reason_FLen:
+     case AngelSVC_Reason_Seek:
+     case AngelSVC_Reason_Remove:
+----------------------------------------------------------------
+
+■ これで説明はおしまい

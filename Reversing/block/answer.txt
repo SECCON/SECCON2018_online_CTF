@@ -1,0 +1,16 @@
+## JP
+
+1. apkファイルをZIPとして解凍します。
+2. "assets/bin/Data/sharedassets0.assets" をデコードします。(各種補助ツール的なものを使うもよし、手動でパースするもよし。uTinyRipperを使うと一発でデコードされます。)
+3. Plateに設定されているカスタムシェーダのコードを読みます。
+4. 特定のX軸のピクセルがスワップされていることがわかります。
+5. その情報を元に手動でflagテクスチャの画像をいじると答えがわかります。
+
+## EN
+
+1. Unzip the apk file.
+2. Decode "assets/bin/Data/sharedassets0.assets". (You can decode various tools. Ex. uTinyRipper is useful.)
+3. Read the custom shader code.
+4. You notice that some pixels on the x-axis are swapped.
+5. Try to swap pixels with flag texture.
+

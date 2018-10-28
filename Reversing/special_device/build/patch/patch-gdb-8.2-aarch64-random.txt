@@ -1,0 +1,211 @@
+--- sim/aarch64/simulator.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/aarch64/simulator.c	2018-10-18 23:09:32.641737000 +0900
+@@ -13754,6 +13754,48 @@
+ #define AngelSVC_Reason_ReportException 0x18
+ #define AngelSVC_Reason_Elapsed         0x30
+ 
++#define RANDOM_DEVICE
++#ifdef RANDOM_DEVICE
++
++void random32_init(uint32_t seed);
++uint32_t get_random32_value(void);
++
++static uint32_t random32_value = 2463534242U;
++
++void random32_init(uint32_t seed)
++{
++  random32_value = seed;
++}
++
++uint32_t get_random32_value(void)
++{
++  /* xorshift (32bit) */
++  random32_value = random32_value ^ (random32_value << 13);
++  random32_value = random32_value ^ (random32_value >> 17);
++  random32_value = random32_value ^ (random32_value << 15);
++  return random32_value;
++}
++
++void random64_init(uint64_t seed);
++uint64_t get_random64_value(void);
++
++static uint64_t random64_value = 88172645463325252ULL;
++
++void random64_init(uint64_t seed)
++{
++  random64_value = seed;
++}
++
++uint64_t get_random64_value(void)
++{
++  /* xorshift (64bit) */
++  random64_value = random64_value ^ (random64_value << 13);
++  random64_value = random64_value ^ (random64_value >>  7);
++  random64_value = random64_value ^ (random64_value << 17);
++  return random64_value;
++}
++
++#endif
+ 
+ static void
+ handle_halt (sim_cpu *cpu, uint32_t val)
+@@ -13769,7 +13811,11 @@
+     }
+ 
+   /* We have encountered an Angel SVC call.  See if we can process it.  */
++#ifndef RANDOM_DEVICE
+   switch (aarch64_get_reg_u32 (cpu, 0, NO_SP))
++#else
++  switch (aarch64_get_reg_u32 (cpu, 8, NO_SP))
++#endif
+     {
+     case AngelSVC_Reason_HeapInfo:
+       {
+@@ -13796,6 +13842,7 @@
+       break;
+ 
+     case AngelSVC_Reason_Open:
++#ifndef RANDOM_DEVICE
+       {
+ 	/* Get the pointer  */
+ 	/* uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);.  */
+@@ -13806,14 +13853,51 @@
+ 
+ 	TRACE_SYSCALL (cpu, " AngelSVC: Open file %d", fd - 1);
+       }
++#else
++      {
++	uint64_t ptr  = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t flag = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t mode = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	char path[64];
++	int fd, i;
++
++	fprintf(stderr, "Open: %08x, %d, %d\n", (int)ptr, (int)flag, (int)mode);
++
++	for (i = 0;; i++) {
++	  path[i] = aarch64_get_mem_u8 (cpu, ptr + i);
++	  if (path[i] == '\0')
++	    break;
++	}
++
++	if (!strcmp(path, "/dev/xorshift32"))
++	  fd = 3;
++	else if (!strcmp(path, "/dev/xorshift64"))
++	  fd = 4;
++	else
++	  break;
++	fprintf(stderr, "File: %s\n", path);
++
++	result = fd;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_Close:
++#ifndef RANDOM_DEVICE
+       {
+ 	uint64_t fh = aarch64_get_reg_u64 (cpu, 1, SP_OK);
+ 	TRACE_SYSCALL (cpu, " AngelSVC: Close file %d", (int) fh);
+ 	result = 0;
+       }
++#else
++      {
++	uint64_t fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	fprintf(stderr, "Close: %d\n", (int)fd);
++	result = 0;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_Errno:
+@@ -13853,6 +13937,7 @@
+       break;
+ 
+     case AngelSVC_Reason_Write:
++#ifndef RANDOM_DEVICE
+       {
+ 	/* Get the pointer  */
+ 	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
+@@ -13893,6 +13978,41 @@
+ 			     sim_stopped, SIM_SIGABRT);
+ 	  }
+       }
++#else
++      {
++	uint64_t  fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t len = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	uint32_t value32;
++	uint64_t value64;
++
++	if (fd == 1) {
++	  printf ("%.*s", (int) len, aarch64_get_mem_ptr (cpu, ptr));
++	  break;
++	}
++
++	fprintf(stderr, "Write: %d, %08x, %d\n", (int)fd, (int)ptr, (int)len);
++
++	if (fd == 3) { /* xorshift32 */
++	  if (len != sizeof(value32))
++	    break;
++	  value32 = aarch64_get_mem_u32 (cpu, ptr);
++	  fprintf(stderr, "Seed: %u\n", value32);
++	  random32_init(value32);
++	} else if (fd == 4) { /* xorshift64 */
++	  if (len != sizeof(value64))
++	    break;
++	  value64 = aarch64_get_mem_u64 (cpu, ptr);
++	  fprintf(stderr, "Seed: %lu\n", value64);
++	  random64_init(value64);
++	} else {
++	  break;
++	}
++
++	result = len;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++#endif
+       break;
+ 
+     case AngelSVC_Reason_ReportException:
+@@ -13917,6 +14037,37 @@
+       break;
+ 
+     case AngelSVC_Reason_Read:
++#ifdef RANDOM_DEVICE
++      {
++	uint64_t  fd = aarch64_get_reg_u64 (cpu, 0, SP_OK);
++	uint64_t ptr = aarch64_get_reg_u64 (cpu, 1, SP_OK);
++	uint64_t len = aarch64_get_reg_u64 (cpu, 2, SP_OK);
++	uint32_t value32;
++	uint64_t value64;
++
++	fprintf(stderr, "Read: %d, %08x, %d\n", (int)fd, (int)ptr, (int)len);
++
++	if (fd == 3) { /* xorshift32 */
++	  if (len != sizeof(value32))
++	    break;
++	  value32 = get_random32_value();
++	  fprintf(stderr, "Value: %08x\n", value32);
++	  aarch64_set_mem_u32 (cpu, ptr, value32);
++	} else if (fd == 4) { /* xorshift64 */
++	  if (len != sizeof(value64))
++	    break;
++	  value64 = get_random64_value();
++	  fprintf(stderr, "Value: %16lx\n", value64);
++	  aarch64_set_mem_u64 (cpu, ptr, value64);
++	} else {
++	  break;
++	}
++
++	result = len;
++	fprintf(stderr, "Return: %d\n", (int)result);
++      }
++      break;
++#endif
+     case AngelSVC_Reason_FLen:
+     case AngelSVC_Reason_Seek:
+     case AngelSVC_Reason_Remove:

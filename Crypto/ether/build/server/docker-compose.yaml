@@ -1,0 +1,36 @@
+version: '2'
+services:
+  flask:
+   build: ./flask
+   #ports:
+   #  - 8000:8000
+   #command: tail -f /dev/null 
+   command: gunicorn app:app -b :8000 --name app -k gevent --worker-connections 1000
+   #volumes:
+   #  - ./flask/src/:/usr/src/webapp
+   environment:
+     - IP_ADDR=127.0.0.1
+   links:
+     - etherver
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - 80:80
+    links:
+      - flask
+
+  # docker-compose logs -f etherver
+  etherver:
+    build: ./etherver
+    ports:
+      - 8545:8545
+      - 30303:30303
+    #command: tail -f /dev/null 
+    command: bash /usr/src/etherver/cmd.sh
+    volumes:
+      - ./etherver/src/:/usr/src/etherver/
+      - ./etherver/ethash/:/root/.ethash/
+

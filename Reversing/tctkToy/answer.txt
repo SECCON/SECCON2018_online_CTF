@@ -1,0 +1,40 @@
+tctkToy read CommandLine arguments in spite of GUI application.
+
+1 -> build & check 
+2 -> help message
+no option and others -> Error message
+
+At first, run tctkToy.exe with argument “1”
+It reads a .tcl file by using Tcl_EvalFile() and has some check procedure of the .tcl file.
+
+Then, you must create the directory C:\\tctkToy to pass the 1st stage.
+
+Challengers can pass all procedure by drag&drop a .tcl file like below. 
+The directory located face.png is anywhere it can read.
+And you don’t have to set the specific button’s options and the text content.
+ 
+
+———————— .tcl ———————
+cd C:\\tctkToy
+exec $env(COMSPEC) /c start C:\\Windows\\System32\\taskmgr.exe
+wm title . "tctkROBO"
+canvas .cv1
+image create photo face -file C:\\\\Users\\\\XXXX\\\\face.png
+.cv1 create image 200 100 -image face
+.cv1 create text 150 250 -text "Commands List" -anchor nw
+pack .cv1
+button .btn_1  -text "Go"  -width 100 -background  green -command { exit 0} 
+pack .btn_1                                                                                 
+button .btn_2  -text "Back"  -width 100 -background blue -command { exit 0} 
+pack .btn_2
+button .btn_3  -text "Stop"  -width 100 -background  red -command { exit 0} 
+pack .btn_3
+————————————————————
+
+if the flag don’t pass the score server despite you get “congraturation! flag is SECCON{a683618184fc18105b7157a52727d004681844be54fd792add4c90ff15a66e6f}” window.
+Please see the appearing message window of this. This is a hint.
+
+MessageBox(hWnd, "review the order following FINISH view. 'pack' must be used once for each component", "If you cannot pass the flag??", MB_OK);
+
+The flag is sha256 hash which is the combination of the first two characters of the tcl file you drag&drop.
+ 

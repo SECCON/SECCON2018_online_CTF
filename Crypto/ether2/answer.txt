@@ -1,0 +1,4 @@
+you will get a hash value in the same way as question1, but in order to change owner address, you have to know original value of the hash.
+If you take a closer look at the hash value, you will find that the value includes its contract address.
+Contract address is computed as 
+"sha3(rlp.encode(['transaction sender address', 'transaction sender nonce']))[12:]"

@@ -1,0 +1,10 @@
+= form_tag admin_sessions_path, method: :post do
+  .form-group
+    .form-group
+      label Login ID
+      = text_field_tag :login_id, '', class: 'form-control'
+    .form-group
+      label Password
+      = password_field_tag :password, '', class: 'form-control'
+    .form-group
+      = submit_tag 'Login', class: 'btn btn-primary'

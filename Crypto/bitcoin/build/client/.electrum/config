@@ -1,0 +1,9 @@
+{
+    "auto_connect": true,
+    "console-history": [],
+    "gui_last_wallet": "/home/wallet/.electrum/wallets/default_wallet",
+    "is_maximized": false,
+    "recently_open": [
+        "/home/wallet/.electrum/wallets/default_wallet"
+    ]
+}

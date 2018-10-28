@@ -1,0 +1,12 @@
+version: '2'
+services:
+  eth1:
+    build: .
+    command: tail -f /dev/null 
+    ports:
+      - 8545:8545
+      - 30304:30303
+    volumes:
+      - ./src/:/usr/src/eth/
+      - ./ethash/:/root/.ethash/
+

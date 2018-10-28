@@ -1,0 +1,20 @@
+version: '2'
+services:
+  flask:
+    build: ./server/flask
+    command: gunicorn app:app -b :8000 --name app -k gevent --worker-connections 1000
+    links:
+      - client
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./server/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - 80:80
+    links:
+      - flask
+
+  client:
+    build: ./client
+    command: bash run.sh

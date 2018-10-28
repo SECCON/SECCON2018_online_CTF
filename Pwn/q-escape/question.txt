@@ -1,0 +1,5 @@
+q-escape
+
+We developed a new device named CYDF :)
+Ubuntu 16.04 latest
+nc q-escape.pwn.seccon.jp 1337

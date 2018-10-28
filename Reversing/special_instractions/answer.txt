@@ -1,0 +1,216 @@
+[EN]
+------
+Challenge Overview:
+
+- A problem that a flag can be obtained by executing it by adding a unique instruction (random number command) to a software CPU named Moxie.
+
+- There is an idea to add a unique command of security function to CPU in order to realize advanced security function. As an exercise, an example is shown in which a random number instruction is added to a software CPU to generate a key.
+
+- It can be executed with the simulator attached to GDB.
+  However, since it uses an independently added random number instruction and it is an instruction using an opcode which is not defined by original, it stops operation with an illegal instruction during execution.
+
+- If the random number command can be executed normally, random number is generated from the fixed SEED, and the flag is restored and outputted.
+
+- Flags can be obtained by installing additional instructions in GDB attached simulator or by understanding the operation of original instructions and analyzing program · operation.
+
+- The algorithm of random number generation uses xorshift (32 bit).
+  Since it is a known algorithm, implementation is possible if the algorithm is known.
+
+Estimated solution:
+
+- Execution file is provided.
+  Since the architecture is unknown, firstly, the architecture is known from the executable file.
+
+- Once the architecture is specified, disassemble and analyze the machine language code.
+
+- When executed with GDB simulator, operation stops with illegal instruction at the position of random number instruction.
+
+- When processing is proceeded with this part as NOP etc., the fact that the original instruction is added and its operation code and simple operation specification (also a random number generation algorithm) are outputted.
+
+- Modify the GDB simulator from the obtained information and add a random number instruction.
+  When executed with a modified simulator, a fixed SEED is given, a random number is obtained from a random number instruction, a flag is restored and outputted.
+
+- However, in Moxie, when you look at the assembly, the return value is returned by r 0, but note that this register number of r 0 is 2 instead of zero.
+  (The register with register number zero seems to hold the return address)
+
+The following is an implementation example of a random number instruction
+(patch for gdb - 8.2)
+----------------------------------------------------------------
+--- sim/moxie/interp.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/moxie/interp.c	2018-09-25 22:39:59.612190000 +0900
+@@ -239,6 +239,30 @@
+ 	      cpu.asregs.regs[11], cpu.asregs.regs[12], cpu.asregs.regs[13], \
+ 	      cpu.asregs.regs[14], cpu.asregs.regs[15])
+ 
++#define RANDOM_INSTRUCTION
++#ifdef RANDOM_INSTRUCTION
++
++void random_init(uint32_t seed);
++uint32_t get_random_value(void);
++
++static uint32_t random_value = 2463534242U;
++
++void random_init(uint32_t seed)
++{
++  random_value = seed;
++}
++
++uint32_t get_random_value(void)
++{
++  /* xorshift (32bit) */
++  random_value = random_value ^ (random_value << 13);
++  random_value = random_value ^ (random_value >> 17);
++  random_value = random_value ^ (random_value << 15);
++  return random_value;
++}
++
++#endif
++
+ void
+ sim_engine_run (SIM_DESC sd,
+ 		int next_cpu_nr, /* ignore  */
+@@ -660,8 +684,27 @@
+ 		cpu.asregs.regs[a] = r >> 32;
+ 	      }
+ 	      break;
++#ifdef RANDOM_INSTRUCTION
++	    case 0x16: /* set random seed */
++	      {
++		int reg = (inst >> 4) & 0xf;
++
++		MOXIE_TRACE_INSN ("setrseed");
++		random_init(cpu.asregs.regs[reg]);
++	      }
++	      break;
++	    case 0x17: /* get random value */
++	      {
++		int reg = (inst >> 4) & 0xf;
++
++		MOXIE_TRACE_INSN ("getrand");
++		cpu.asregs.regs[reg] = get_random_value();
++	      }
++	      break;
++#else
+ 	    case 0x16: /* bad */
+ 	    case 0x17: /* bad */
++#endif
+ 	    case 0x18: /* bad */
+ 	      {
+ 		opc = opcode;
+----------------------------------------------------------------
+
+
+
+
+[JP]
+------
+■ 問題の概要
+
+・MoxieというソフトウェアCPUに対して，独自の命令(乱数命令)を追加して
+  実行すると正常実行できてフラグが得られる，という問題．
+
+・高度なセキュリティ機能を実現するために，CPUにセキュリティ機能の独自命令を
+  追加する，というアイディアがある．その練習として，ソフトウェアCPUに乱数命令を
+  追加して鍵生成する例を示している．
+
+・GDB付属のシミュレータで実行できる．
+  しかし独自に追加した乱数命令を利用しており，オリジナルでは定義されていない
+  オペコードを用いた命令であるため，実行中に不正命令で動作停止する．
+
+・乱数命令が正常に実行できれば，固定のSEEDから乱数発生させ，フラグを復元して
+  出力する．
+
+・GDB付属のシミュレータに独自命令を追加実装するか，もしくは独自命令の動作を
+  理解してプログラムを解析・動作推測することで，フラグが得られる．
+
+・乱数生成のアルゴリズムは xorshift (32bit) を使用．
+  既知のアルゴリズムであるため，アルゴリズムがわかれば実装は可能．
+
+■ 想定解法
+
+・実行ファイルが提供される．
+  アーキテクチャが不明なので，まずは実行ファイルからアーキテクチャを知る．
+
+・アーキテクチャが特定できたら，機械語コードを逆アセンブルし解析する．
+
+・GDBのシミュレータで実行すると，乱数命令の位置で不正命令で動作停止する．
+
+・ひとまず当該部分をNOPなどにして処理を進めると，独自命令が追加されている
+  ということと，そのオペコードや簡単な動作仕様(乱数生成アルゴリズムも)が
+  出力される．
+
+・得られた情報からGDBのシミュレータを修正し乱数命令を追加する．
+  修正版シミュレータで実行すると，固定のSEEDが与えられ，乱数命令から
+  乱数が得られてフラグが復元され出力される．
+
+・ただしMoxieでは，アセンブリを見ると戻り値はr0で返されるが，このr0のレジスタ
+  番号はゼロではなく２であるため注意．
+  (レジスタ番号ゼロのレジスタは，リターンアドレスを保持しているようだ)
+
+以下は乱数命令の実装例
+(gdb-8.2に対するパッチ)
+----------------------------------------------------------------
+--- sim/moxie/interp.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/moxie/interp.c	2018-09-25 22:39:59.612190000 +0900
+@@ -239,6 +239,30 @@
+ 	      cpu.asregs.regs[11], cpu.asregs.regs[12], cpu.asregs.regs[13], \
+ 	      cpu.asregs.regs[14], cpu.asregs.regs[15])
+ 
++#define RANDOM_INSTRUCTION
++#ifdef RANDOM_INSTRUCTION
++
++void random_init(uint32_t seed);
++uint32_t get_random_value(void);
++
++static uint32_t random_value = 2463534242U;
++
++void random_init(uint32_t seed)
++{
++  random_value = seed;
++}
++
++uint32_t get_random_value(void)
++{
++  /* xorshift (32bit) */
++  random_value = random_value ^ (random_value << 13);
++  random_value = random_value ^ (random_value >> 17);
++  random_value = random_value ^ (random_value << 15);
++  return random_value;
++}
++
++#endif
++
+ void
+ sim_engine_run (SIM_DESC sd,
+ 		int next_cpu_nr, /* ignore  */
+@@ -660,8 +684,27 @@
+ 		cpu.asregs.regs[a] = r >> 32;
+ 	      }
+ 	      break;
++#ifdef RANDOM_INSTRUCTION
++	    case 0x16: /* set random seed */
++	      {
++		int reg = (inst >> 4) & 0xf;
++
++		MOXIE_TRACE_INSN ("setrseed");
++		random_init(cpu.asregs.regs[reg]);
++	      }
++	      break;
++	    case 0x17: /* get random value */
++	      {
++		int reg = (inst >> 4) & 0xf;
++
++		MOXIE_TRACE_INSN ("getrand");
++		cpu.asregs.regs[reg] = get_random_value();
++	      }
++	      break;
++#else
+ 	    case 0x16: /* bad */
+ 	    case 0x17: /* bad */
++#endif
+ 	    case 0x18: /* bad */
+ 	      {
+ 		opc = opcode;
+----------------------------------------------------------------
+
+■ これで説明はおしまい

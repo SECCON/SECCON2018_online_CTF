@@ -1,0 +1,51 @@
+# Answer
+
+1. Extract apk as a zip file.
+2. Find the domain name of the staging environment and development environment from `\ assets \ bin \ Data \ Managed \ Metadata \ global-metadata.dat`. Also find that `/ admin` exists.
+3. Verify that `/ admin` exists for the staging or production environment.
+4. Attack because SQLi exists in the password field for the login form of `/ admin` in the staging environment.
+5. Get the flag from the `flags` table on the database.
+
+# Solution
+
+If you play the game with the appropriate Android emulator (Nox etc.), you can see that it is compatible with online ranking.
+Looking at the packet, you can see that it is communicating with the server, but there is no particular vulnerability in this API.
+If you try to open `/ admin` for the domain of the communication destination, you can see that the page exists, but it can not be opened with access control.
+By parsing the application, domains of multiple servers can be found. From the domain name, you can see that it seems to be a development environment and a staging environment.
+Only in the staging environment, since the IP control is not done, the management screen opens.
+On the management screen, you are asked to log in. The password field of this login form has SQLi vulnerability.
+You can use this SQLi to acquire flags from the database.
+
+# Background
+
+If you leave unnecessary information in the application, there is a possibility that environments that you do not want to access often are leaked out.
+Also, a question from an actual case that access control leaks overlap will result in unexpected access.
+Even if you have a query builder, such as Rails' ActiveRecord, SQLi can occur if you make a mistake.
+
+
+
+--------
+
+# 解答
+
+1. apkをzipファイルとして解凍する。
+2. `\assets\bin\Data\Managed\Metadata\global-metadata.dat` からステージング環境と開発環境のドメイン名を見つける。更に `/admin` が存在することを見つける。
+3. ステージング環境または本番環境に対して `/admin` が存在することを確認する。
+4. ステージング環境の `/admin` のログインフォームに対してパスワードの欄に SQLi が存在するので攻撃する。
+5. データベース上の `flags` テーブルからフラッグをゲット。
+
+# 解法
+
+適当なAndroidエミュレータ(Nox等)でゲームをプレイすると、オンラインランキングに対応していることが分かる。
+パケットを見ると、サーバと通信していることが分かるが、このAPIには特に脆弱性は存在しない。
+通信先のドメインに対して `/admin` を開こうとすると、ページが存在していることは分かるが、アクセス制御されていて開けない。
+アプリを解析すると、複数のサーバのドメインが見つかる。ドメイン名から、開発環境とステージング環境らしきことが分かる。
+ステージング環境のみ、IP制御がされていないため、管理画面が開けてしまう。
+管理画面では、ログインを求められる。このログインフォームのパスワード欄には、SQLiの脆弱性がある。
+このSQLiを利用し、データベース上からフラッグを獲得できる。
+
+# 背景
+
+アプリ内に不要な情報を残すと、あまりアクセスしてほしくない環境が漏れてしまう可能性があるということ。
+また、アクセス制御漏れが重なると、予期せぬアクセスを許可してしまうことになるという実際の事例からの出題。
+RailsのActiveRecordなど、クエリビルダが備わっているものも、扱いを間違えるとSQLiが発生しうる。

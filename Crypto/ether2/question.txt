@@ -1,0 +1,6 @@
+Smart Gacha Lv.2
+
+We don't want to think that you cheated, but we enhance security of the contract.
+OK, press "test luck" button to check your luck!
+
+Server:http://ether.pwn.seccon.jp/

@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    meta charset="utf-8"
+    meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"
+
+    title
+      | Shooter Admin
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+  body
+    .navbar.navbar-expand-lg.navbar-light.bg-light.mb-3
+      a.navbar-brand Shooter Admin
+      .collapse.navbar-collapse
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            = link_to admin_users_path, class: 'nav-link' do
+              | Users
+          li.nav-item
+            = link_to admin_system_config_path, class: 'nav-link' do
+              | SystemConfig
+    .container
+      = yield

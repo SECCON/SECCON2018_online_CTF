@@ -1,0 +1,61 @@
+--- sim/moxie/interp.c.orig	2018-01-05 13:07:23.000000000 +0900
++++ sim/moxie/interp.c	2018-09-25 22:39:59.612190000 +0900
+@@ -239,6 +239,30 @@
+ 	      cpu.asregs.regs[11], cpu.asregs.regs[12], cpu.asregs.regs[13], \
+ 	      cpu.asregs.regs[14], cpu.asregs.regs[15])
+ 
++#define RANDOM_INSTRUCTION
++#ifdef RANDOM_INSTRUCTION
++
++void random_init(uint32_t seed);
++uint32_t get_random_value(void);
++
++static uint32_t random_value = 2463534242U;
++
++void random_init(uint32_t seed)
++{
++  random_value = seed;
++}
++
++uint32_t get_random_value(void)
++{
++  /* xorshift (32bit) */
++  random_value = random_value ^ (random_value << 13);
++  random_value = random_value ^ (random_value >> 17);
++  random_value = random_value ^ (random_value << 15);
++  return random_value;
++}
++
++#endif
++
+ void
+ sim_engine_run (SIM_DESC sd,
+ 		int next_cpu_nr, /* ignore  */
+@@ -660,8 +684,27 @@
+ 		cpu.asregs.regs[a] = r >> 32;
+ 	      }
+ 	      break;
++#ifdef RANDOM_INSTRUCTION
++	    case 0x16: /* set random seed */
++	      {
++		int reg = (inst >> 4) & 0xf;
++
++		MOXIE_TRACE_INSN ("setrseed");
++		random_init(cpu.asregs.regs[reg]);
++	      }
++	      break;
++	    case 0x17: /* get random value */
++	      {
++		int reg = (inst >> 4) & 0xf;
++
++		MOXIE_TRACE_INSN ("getrand");
++		cpu.asregs.regs[reg] = get_random_value();
++	      }
++	      break;
++#else
+ 	    case 0x16: /* bad */
+ 	    case 0x17: /* bad */
++#endif
+ 	    case 0x18: /* bad */
+ 	      {
+ 		opc = opcode;
